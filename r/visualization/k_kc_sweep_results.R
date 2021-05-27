@@ -1,4 +1,4 @@
-# Amirhossein Afshinfard 
+# by Amirhossein Afshinfard 
 # afshinfard @ github / aafshinfard @ github
 # aafshinfard@gmail.com
 
@@ -8,5 +8,5 @@
 #| name_2 | NGA50_2 | NG50_2  | N50_2  | misassembly_2 | genome fraction_2 |   
 # ....
 # These file may be generated using:
-#   https://github.com/afshinfard/scripts/assembly/quast-analysis $$$$$$$$$$$$$$$$$$$$$
-#   https://github.com/afshinfard/scripts/assembly/quast-analysis $$$$$$$$$$$$$$$$$$$$$
+#   https://github.com/afshinfard/scripts/blob/main/assembly/quast/quast-get-summaries.sh
+
