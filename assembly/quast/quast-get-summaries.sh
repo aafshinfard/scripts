@@ -2,6 +2,7 @@
 # afshinfard @ github / aafshinfard @ github
 # aafshinfard@gmail.com
 
+# incomplete
 
 dir_pattern="2x*/*quast/"
 
