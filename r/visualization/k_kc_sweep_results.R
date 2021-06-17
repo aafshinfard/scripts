@@ -18,6 +18,15 @@ kc2="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg0
 kc3="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x100/quast_kc3_summary.tsv";
 kc4="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x100/quast_kc4_summary.tsv";
 
+experiment="abyss2.5 2x150"
+kc2="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x150/quast_kc2_summary.tsv";
+kc3="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x150/quast_kc3_summary.tsv";
+kc4="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x150/quast_kc4_summary.tsv";
+
+experiment="abyss2.5 2x301"
+kc2="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x301/quast_kc2_summary.tsv";
+kc3="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x301/quast_kc3_summary.tsv";
+kc4="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x301/quast_kc4_summary.tsv";
 ####################################################
 
 library(ggplot2)
@@ -110,10 +119,10 @@ df[,"kc"] = as.factor(df[,"kc"])
 #df$tool <- factor(df$tool, levels=unique(df$tool[order(df$order)] ))
 colnames(df)
 
-n50=plotter_k_vs_any("n50", df, "n50")
-ng50=plotter_k_vs_any("ng50", df, "ng50")
-nga50=plotter_k_vs_any("nga50", df, "nga50")
-miss=plotter_k_vs_any("misassemblies", df, "misassemblies")
+n50=plotter_k_vs_any(experiment, df, "n50")
+ng50=plotter_k_vs_any(experiment, df, "ng50")
+nga50=plotter_k_vs_any(experiment, df, "nga50")
+miss=plotter_k_vs_any(experiment, df, "misassemblies")
 
 n50
 ng50
@@ -124,6 +133,43 @@ library(gridExtra)
 
 grid.arrange(n50, ng50, nga50, miss, ncol=1)
 
+
+library(ggpubr)
+
+ggarrange(n50+ rremove("xlab"), ng50+ rremove("xlab"), nga50+ rremove("xlab"), miss,
+          labels = NULL,
+          align="hv",
+          ncol=1, nrow=4, common.legend = TRUE, legend="right")
+
+
+
+## memory
+stop = 1
+n50_100 = n50
+ng50_100 = ng50
+nga50_100 = nga50
+miss_100 = miss
+
+n50_150 = n50
+ng50_150 = ng50
+nga50_150 = nga50
+miss_150 = miss
+
+n50_301 = n50
+ng50_301 = ng50
+nga50_301 = nga50
+miss_301 = miss
+
+ggarrange(n50_100+ rremove("xlab")+rremove("x.text"),n50_150+ rremove("xlab")+rremove("ylab")+rremove("xy.text"),n50_301+ rremove("xlab")+rremove("ylab")+rremove("xy.text"),
+          ng50_100+ rremove("xlab")+rremove("x.text"), ng50_150+ rremove("xlab")+rremove("ylab")+rremove("xy.text"), ng50_301+ rremove("xlab")+rremove("ylab")+rremove("xy.text"),
+          nga50_100+ rremove("xlab")+rremove("x.text"), nga50_150+ rremove("xlab")+rremove("ylab")+rremove("xy.text"), nga50_301+ rremove("xlab")+rremove("ylab")+rremove("xy.text"), 
+          miss_100,miss_150+rremove("ylab")+rremove("y.text"),miss_301+rremove("ylab")+rremove("y.text"),
+          labels = NULL,
+          align="hv",
+          ncol=3, nrow=4, common.legend = TRUE, legend="right")
+
+
+####################
 
 
 library(reshape2)
