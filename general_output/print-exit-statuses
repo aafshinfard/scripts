@@ -1,6 +1,12 @@
 #!/bin/bash
 
-pattern=$1 # example pattern: .*abyss.*err or .*err
+if [ -z "$1" ]
+then
+	pattern=".*err"
+else
+	pattern=$1
+fi      
+
 echo "pattern is:"
 echo $pattern
 for f in $(find ./* -maxdepth 1 -mindepth 1 | grep "${pattern}$"); do
