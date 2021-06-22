@@ -3,33 +3,31 @@
 # aafshinfard@gmail.com
 
 ##### Description:
-# Input format: 3 files 1 per each kc value (kc 1:3), each file looks like:
+# Input format: 1 file per experiment, each file looks like:
 #| name_1 | NGA50_1 | NG50_1  | N50_1  | misassembly_1 | genome fraction_1 |   
 #| name_2 | NGA50_2 | NG50_2  | N50_2  | misassembly_2 | genome fraction_2 |   
 # ....
-# name should be formatted as BLAHBLAH-k[0-9]*-BLAHBLAH..., or you can change the script (the "reformat" function).
+# name should be formatted as {.*-k[0-9]*-kc[0-9]-.*}, (like assembly-k100-kc2-B40G/quast-analysis)
+# or you can change the script (the "reformat" function).
 #
-# These sor of files may be generated using:
+# These sort of files may be generated using: [TODO]
 #   https://github.com/afshinfard/scripts/blob/main/assembly/quast/quast-get-summaries.sh
 
 ### Inputs:
-experiment="abyss2.5 2x100"
-kc2="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x100/quast_kc2_summary.tsv";
-kc3="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x100/quast_kc3_summary.tsv";
-kc4="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x100/quast_kc4_summary.tsv";
 
-experiment="abyss2.5 2x150"
-kc2="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x150/quast_kc2_summary.tsv";
-kc3="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x150/quast_kc3_summary.tsv";
-kc4="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x150/quast_kc4_summary.tsv";
+exp1_n="na12878 2x151"
+exp1="/projects/btl_scratch/aafshinfard/projects/abyss2.5/hsapiens/experiments/numbers2/abyss2.5/na12878_2x151/quast_full_summary.tsv";
 
-experiment="abyss2.5 2x301"
-kc2="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x301/quast_kc2_summary.tsv";
-kc3="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x301/quast_kc3_summary.tsv";
-kc4="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/experiments/hpcg02/abyss2.5/2x301/quast_kc4_summary.tsv";
+exp2_n="na24631 2x151"
+exp2="/projects/btl_scratch/aafshinfard/projects/abyss2.5/hsapiens/experiments/numbers2/abyss2.5/na24631_2x151/quast_full_summary.tsv";
 
-#######
+exp3_n="na24143 2x250"
+exp3="/projects/btl_scratch/aafshinfard/projects/abyss2.5/hsapiens/experiments/numbers2/abyss2.5/na24143_2x250/quast_full_summary.tsv";
 
+exp4_n="na24385 2x250"
+exp4="/projects/btl_scratch/aafshinfard/projects/abyss2.5/hsapiens/experiments/numbers2/abyss2.5/na24385_2x250/quast_full_summary.tsv";
+
+####################################################
 
 library(ggplot2)
 library(PtProcess)
@@ -38,27 +36,32 @@ library(grid)
 library(gridExtra)
 
 #
-reformat <- function(kcxf, kc){
-  kcxf = kcxf[2:length(kcxf)-1]
-  colnames(kcxf)=c("name","k","nga50","ng50","n50", "misassemblies", "fraction")
+reformat <- function(kcxf, exp_n){
+  #kcxf = kcxf[1:length(kcxf)-1]
+  colnames(kcxf)=c("kc","k","nga50","ng50","n50", "misassemblies", "fraction","exp_n")
   
   splits=strsplit(as.character(kcxf[,2]), split = "-", fixed = TRUE)
   
   df <- data.frame(matrix(unlist(splits), nrow=length(splits), byrow=TRUE))
-  kcxf[,1]=df[,2]
+  kcxf[,2]=df[,2]
+  kcxf[,1]=df[,3]
   
   splits=strsplit(as.character(df[,2]), split = "k")
   df2 <- data.frame(matrix(unlist(splits), nrow=length(splits), byrow=TRUE))
   kcxf[,2]=as.numeric(as.character(df2[,2]))
-  kcxf[,"kc"]=kc
+  
+  splits=strsplit(as.character(df[,3]), split = "kc")
+  df2 <- data.frame(matrix(unlist(splits), nrow=length(splits), byrow=TRUE))
+  kcxf[,1]=as.numeric(as.character(df2[,2]))
+  kcxf[,length(kcxf)] = exp_n
   return (kcxf)
 }
 
 plotter_k_vs_any <- function(experiment, data, y_par="ng50", xlimits=0, ylimits=0, breaks_count=0,
-                     x_breaks=c(0,300,600,900,1200,1500,1800,2100,2400,2700,3000,3300),
-                     x_breaks_labels=c("0","5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55" ),
-                     y_breaks=c(0,50,100,150,200,250, 300, 350,400 ),
-                     y_breaks_labels=c(0,50,100,150,200,250, 300, 350,400 )){
+                             x_breaks=c(0,300,600,900,1200,1500,1800,2100,2400,2700,3000,3300),
+                             x_breaks_labels=c("0","5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55" ),
+                             y_breaks=c(0,50,100,150,200,250, 300, 350,400 ),
+                             y_breaks_labels=c(0,50,100,150,200,250, 300, 350,400 )){
   if(xlimits==0){
     xlimits=c(0,3300)
   }
@@ -108,23 +111,42 @@ plotter_k_vs_any <- function(experiment, data, y_par="ng50", xlimits=0, ylimits=
 
 ##
 
-kc2f = read.table(kc2, header = FALSE, sep = "|")
-kc3f = read.table(kc3, header = FALSE, sep = "|")
-kc4f = read.table(kc4, header = FALSE, sep = "|")
+exp1_f = read.table(exp1, header = FALSE, sep = "|", skip = 2)
+exp2_f = read.table(exp2, header = FALSE, sep = "|", skip = 2)
+exp3_f = read.table(exp3, header = FALSE, sep = "|", skip = 2)
+exp4_f = read.table(exp4, header = FALSE, sep = "|", skip = 2)
 
-df_kc2 = reformat(kc2f, 2)
-df_kc3 = reformat(kc3f, 3)
-df_kc4 = reformat(kc4f, 4)
+df_exp1 = reformat(exp1_f, exp1_n)
+df_exp2 = reformat(exp2_f, exp2_n)
+df_exp3 = reformat(exp3_f, exp3_n)
+df_exp4 = reformat(exp4_f, exp4_n)
 
-df = rbind(df_kc2, df_kc3, df_kc4)
+dim(df_exp1)
+dim(df_exp2)
+dim(df_exp3)
+dim(df_exp4)
+
+# df_kc2 = reformat(kc2f, 2)
+
+df = rbind(df_exp1,df_exp2,df_exp3,df_exp4)
+#df = rbind(df_kc2, df_kc3, df_kc4)
 df[,"kc"] = as.factor(df[,"kc"])
+df[,"exp_n"] = as.factor(df[,"exp_n"])
 #df$tool <- factor(df$tool, levels=unique(df$tool[order(df$order)] ))
 colnames(df)
 
+## facet_warp all together
 n50=plotter_k_vs_any(experiment, df, "n50")
+n50 <- n50 + facet_wrap(~exp_n, scales = "free_x", ncol = 4)
+
 ng50=plotter_k_vs_any(experiment, df, "ng50")
+ng50 <- ng50 + facet_wrap(~exp_n, scales = "free_x", ncol = 4)
+
 nga50=plotter_k_vs_any(experiment, df, "nga50")
+nga50 <- nga50 + facet_wrap(~exp_n, scales = "free_x", ncol = 4)
+
 miss=plotter_k_vs_any(experiment, df, "misassemblies")
+miss <- miss + facet_wrap(~exp_n, scales = "free_x", ncol = 4)
 
 n50
 ng50
@@ -143,6 +165,13 @@ ggarrange(n50+ rremove("xlab"), ng50+ rremove("xlab"), nga50+ rremove("xlab"), m
           align="hv",
           ncol=1, nrow=4, common.legend = TRUE, legend="right")
 
+ggarrange(n50+ rremove("xlab")+rremove("x.text")+ggtitle("")+theme(strip.text = element_text(size=18)),
+          ng50+ rremove("xlab")+rremove("x.text")+ggtitle("")+theme(strip.background = element_blank(), strip.text = element_blank()),
+          nga50+ rremove("xlab")+rremove("x.text")+ggtitle("")+theme(strip.background = element_blank(), strip.text = element_blank()),
+          miss+ggtitle("")+theme(strip.background = element_blank(), strip.text = element_blank()),
+          labels = NULL,
+          align="hv",
+          ncol=1, nrow=4, common.legend = TRUE, legend="right")
 
 
 ## memory
