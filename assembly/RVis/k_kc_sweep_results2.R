@@ -57,18 +57,13 @@ reformat <- function(kcxf, exp_n){
   return (kcxf)
 }
 
-plotter_k_vs_any <- function(experiment, data, y_par="ng50", xlimits=0, ylimits=0, breaks_count=0,
-                             x_breaks=c(0,300,600,900,1200,1500,1800,2100,2400,2700,3000,3300),
-                             x_breaks_labels=c("0","5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55" ),
+plotter_k_vs_any <- function(experiment, data, y_par="ng50", xlimits=NULL, ylimits=0, breaks_count=0,
+                             x_breaks=NULL,
+                             x_breaks_labels=NULL,
                              y_breaks=c(0,50,100,150,200,250, 300, 350,400 ),
                              y_breaks_labels=c(0,50,100,150,200,250, 300, 350,400 )){
-  if(xlimits==0){
-    xlimits=c(0,3300)
-  }
-  if(ylimits==0){
-    ylimits=c(0,400)
-  }
-  range50 <- ggplot(df, aes_string("k",y_par , 
+  
+  range50 <- ggplot(data, aes_string("k",y_par , 
                                    color = "kc", 
                                    shape = "kc",#Sample,
                                    fill = "kc")) + #Algorithm)) 
@@ -84,9 +79,8 @@ plotter_k_vs_any <- function(experiment, data, y_par="ng50", xlimits=0, ylimits=
       legend.title = element_text(size=15),
       legend.text = element_text(size=15)
     ) +
-    xlab("k value") + ylab(as.character(y_par)) #+
-  #scale_x_continuous(limits = xlimits,
-  #                   breaks=x_breaks, labels=x_breaks_labels)+
+    xlab("k value") + ylab(as.character(y_par))
+  
   #scale_y_continuous(limits = ylimits,
   #                   #breaks=c(0,5e6,10e6,15e6,20e6,25e6,30e6,40e6,50e6,60e6,70e6,80e6 ),
   #                   breaks=y_breaks,
@@ -95,6 +89,14 @@ plotter_k_vs_any <- function(experiment, data, y_par="ng50", xlimits=0, ylimits=
   #                   labels=y_breaks_labels )
   #labels=c("0","5","10","15","20","25","30","40", "50","60","70","80") )
   #return (range50)
+  if((! is.null(xlimits)) && (! is.null(x_breaks)) ){
+    range50=range50+scale_x_continuous(limits = xlimits, breaks=x_breaks)
+  } else if (! is.null(xlimits)) {
+    range50=range50+scale_x_continuous(limits = xlimits)
+  } else if (! is.null(x_breaks)) {
+    range50=range50+scale_x_continuous(breaks=x_breaks)
+  }
+   
   frange50 <- range50 + geom_line(aes_string(x="k", y= y_par), size=2, position=position_dodge(width=0.5)) + ggtitle(c(experiment,"k/kc sweep")) +
     theme(
       panel.grid.major.y = element_line(colour="gray", size=0.6, linetype=1,
@@ -135,7 +137,9 @@ df[,"exp_n"] = as.factor(df[,"exp_n"])
 #df$tool <- factor(df$tool, levels=unique(df$tool[order(df$order)] ))
 colnames(df)
 
+############################################################
 ## facet_warp all together
+## alternatively go to the next section for seperate plots with various k labels
 n50=plotter_k_vs_any(experiment, df, "n50")
 n50 <- n50 + facet_wrap(~exp_n, scales = "free_x", ncol = 4)
 
@@ -157,7 +161,6 @@ library(gridExtra)
 
 grid.arrange(n50, ng50, nga50, miss, ncol=1)
 
-
 library(ggpubr)
 
 ggarrange(n50+ rremove("xlab"), ng50+ rremove("xlab"), nga50+ rremove("xlab"), miss,
@@ -173,7 +176,79 @@ ggarrange(n50+ rremove("xlab")+rremove("x.text")+ggtitle("")+theme(strip.text = 
           align="hv",
           ncol=1, nrow=4, common.legend = TRUE, legend="right")
 
+############################################################
+## full ggarrange
+##
+experiment=exp1_n
+xlimit=c(68,112)
+xbreaks=c(seq(70, 140, by = 10))
 
+df_temp = df[df[,"exp_n"]==experiment,]
+
+n50=plotter_k_vs_any(experiment, df_temp, "n50", xlimits = xlimit, x_breaks = xbreaks)
+ng50=plotter_k_vs_any(experiment, df_temp, "ng50", xlimits = xlimit, x_breaks = xbreaks)
+nga50=plotter_k_vs_any(experiment, df_temp, "nga50", xlimits = xlimit, x_breaks = xbreaks)
+miss=plotter_k_vs_any(experiment, df_temp, "misassemblies", xlimits = xlimit, x_breaks = xbreaks)
+
+exp1_p = ggarrange(n50+ rremove("xlab"), ng50+ rremove("xlab"), nga50+ rremove("xlab"), miss,
+          labels = NULL,
+          align="hv",
+          ncol=1, nrow=4, common.legend = TRUE, legend="right")
+######
+experiment=exp2_n
+xlimit=c(68,112)
+xbreaks=c(seq(70, 140, by = 10))
+
+df_temp = df[df[,"exp_n"]==experiment,]
+
+n50=plotter_k_vs_any(experiment, df_temp, "n50", xlimits = xlimit, x_breaks = xbreaks)
+ng50=plotter_k_vs_any(experiment, df_temp, "ng50", xlimits = xlimit, x_breaks = xbreaks)
+nga50=plotter_k_vs_any(experiment, df_temp, "nga50", xlimits = xlimit, x_breaks = xbreaks)
+miss=plotter_k_vs_any(experiment, df_temp, "misassemblies", xlimits = xlimit, x_breaks = xbreaks)
+
+exp2_p = ggarrange(n50+ rremove("xlab"), ng50+ rremove("xlab"), nga50+ rremove("xlab"), miss,
+                   labels = NULL,
+                   align="hv",
+                   ncol=1, nrow=4, common.legend = TRUE, legend="right")
+######
+experiment=exp3_n
+xlimit=c(88,167)
+xbreaks=seq(90, 250, by = 15)
+
+df_temp = df[df[,"exp_n"]==experiment,]
+
+n50=plotter_k_vs_any(experiment, df_temp, "n50", xlimits = xlimit, x_breaks = xbreaks)
+ng50=plotter_k_vs_any(experiment, df_temp, "ng50", xlimits = xlimit, x_breaks = xbreaks)
+nga50=plotter_k_vs_any(experiment, df_temp, "nga50", xlimits = xlimit, x_breaks = xbreaks)
+miss=plotter_k_vs_any(experiment, df_temp, "misassemblies", xlimits = xlimit, x_breaks = xbreaks)
+
+exp3_p = ggarrange(n50+ rremove("xlab"), ng50+ rremove("xlab"), nga50+ rremove("xlab"), miss,
+                   labels = NULL,
+                   align="hv",
+                   ncol=1, nrow=4, common.legend = TRUE, legend="right")
+######
+experiment=exp4_n
+xlimit=c(88,167)
+xbreaks=seq(90, 250, by = 30)
+
+df_temp = df[df[,"exp_n"]==experiment,]
+
+n50=plotter_k_vs_any(experiment, df_temp, "n50", xlimits = xlimit, x_breaks = xbreaks)
+ng50=plotter_k_vs_any(experiment, df_temp, "ng50", xlimits = xlimit, x_breaks = xbreaks)
+nga50=plotter_k_vs_any(experiment, df_temp, "nga50", xlimits = xlimit, x_breaks = xbreaks)
+miss=plotter_k_vs_any(experiment, df_temp, "misassemblies", xlimits = xlimit, x_breaks = xbreaks)
+
+exp4_p = ggarrange(n50+ rremove("xlab"), ng50+ rremove("xlab"), nga50+ rremove("xlab"), miss,
+                   labels = NULL,
+                   align="hv",
+                   ncol=1, nrow=4, common.legend = TRUE, legend="right")
+##################
+##################
+
+ggarrange(exp1_p,exp2_p,exp3_p,exp4_p,
+          common.legend = TRUE, legend="right", ncol = 4)
+######
+##################################################################
 ## memory
 stop = 1
 n50_100 = n50
