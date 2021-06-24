@@ -5,7 +5,7 @@
 # incomplete
 
 dir_pattern="2x*/*quast/"
-dir_pattern="assembly-k*/quast-analysis/"
+dir_pattern="assembly-k*/quast-analysi*/"
 
 
 #### Summarize in Vlad's style
