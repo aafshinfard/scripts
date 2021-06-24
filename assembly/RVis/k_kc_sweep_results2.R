@@ -14,17 +14,22 @@
 #   https://github.com/afshinfard/scripts/blob/main/assembly/quast/quast-get-summaries.sh
 
 ### Inputs:
+##### E.Coli:
 
-exp1_n="na12878 2x151"
+##### HSapiens:
+species="hsapiens"
+setwd("/projects/btl_scratch/aafshinfard/projects/abyss2.5/hsapiens/figures/assembly_quality")
+
+exp1_n="na12878 (2x151)"
 exp1="/projects/btl_scratch/aafshinfard/projects/abyss2.5/hsapiens/experiments/numbers2/abyss2.5/na12878_2x151/quast_full_summary.tsv";
 
-exp2_n="na24631 2x151"
+exp2_n="na24631 (2x151)"
 exp2="/projects/btl_scratch/aafshinfard/projects/abyss2.5/hsapiens/experiments/numbers2/abyss2.5/na24631_2x151/quast_full_summary.tsv";
 
-exp3_n="na24143 2x250"
+exp3_n="na24143 (2x250)"
 exp3="/projects/btl_scratch/aafshinfard/projects/abyss2.5/hsapiens/experiments/numbers2/abyss2.5/na24143_2x250/quast_full_summary.tsv";
 
-exp4_n="na24385 2x250"
+exp4_n="na24385 (2x250)"
 exp4="/projects/btl_scratch/aafshinfard/projects/abyss2.5/hsapiens/experiments/numbers2/abyss2.5/na24385_2x250/quast_full_summary.tsv";
 
 ####################################################
@@ -57,11 +62,11 @@ reformat <- function(kcxf, exp_n){
   return (kcxf)
 }
 
-plotter_k_vs_any <- function(experiment, data, y_par="ng50", xlimits=NULL, ylimits=0, breaks_count=0,
+plotter_k_vs_any <- function(experiment, data, y_par="ng50", xlimits=NULL, ylimits=NULL, breaks_count=0,
                              x_breaks=NULL,
                              x_breaks_labels=NULL,
-                             y_breaks=c(0,50,100,150,200,250, 300, 350,400 ),
-                             y_breaks_labels=c(0,50,100,150,200,250, 300, 350,400 )){
+                             y_breaks=NULL,
+                             y_breaks_labels=NULL){
   
   range50 <- ggplot(data, aes_string("k",y_par , 
                                    color = "kc", 
@@ -89,6 +94,9 @@ plotter_k_vs_any <- function(experiment, data, y_par="ng50", xlimits=NULL, ylimi
   #                   labels=y_breaks_labels )
   #labels=c("0","5","10","15","20","25","30","40", "50","60","70","80") )
   #return (range50)
+  if((! is.null(ylimits)) && (! is.null(y_breaks)) && (! is.null(y_breaks_labels)) ){
+    range50=range50+scale_y_continuous(limits = ylimits, breaks=y_breaks, labels = y_breaks_labels)
+  }
   if((! is.null(xlimits)) && (! is.null(x_breaks)) ){
     range50=range50+scale_x_continuous(limits = xlimits, breaks=x_breaks)
   } else if (! is.null(xlimits)) {
@@ -179,21 +187,43 @@ ggarrange(n50+ rremove("xlab")+rremove("x.text")+ggtitle("")+theme(strip.text = 
 ############################################################
 ## full ggarrange
 ##
+ylimit=c(0,125200)
+ybreaks=seq(0, 125000, by = 25000)
+ybreakslabs=c(c("0","25 Kb","50 Kb","75 Kb","100 Kb","125 Kb"))
+
+ylimit2=c(0,5200)
+ybreaks2=seq(0, 3000, by = 1000)
+ybreakslabs2=ybreaks2
+
 experiment=exp1_n
 xlimit=c(68,112)
 xbreaks=c(seq(70, 140, by = 10))
 
 df_temp = df[df[,"exp_n"]==experiment,]
 
-n50=plotter_k_vs_any(experiment, df_temp, "n50", xlimits = xlimit, x_breaks = xbreaks)
-ng50=plotter_k_vs_any(experiment, df_temp, "ng50", xlimits = xlimit, x_breaks = xbreaks)
-nga50=plotter_k_vs_any(experiment, df_temp, "nga50", xlimits = xlimit, x_breaks = xbreaks)
-miss=plotter_k_vs_any(experiment, df_temp, "misassemblies", xlimits = xlimit, x_breaks = xbreaks)
+n50=plotter_k_vs_any(experiment, df_temp, "n50",
+                     xlimits = xlimit, x_breaks = xbreaks, ylimits = ylimit, y_breaks = ybreaks, y_breaks_labels = ybreakslabs )
+ng50=plotter_k_vs_any(experiment, df_temp, "ng50",
+                      xlimits = xlimit, x_breaks = xbreaks, ylimits = ylimit, y_breaks = ybreaks, y_breaks_labels = ybreakslabs )
+nga50=plotter_k_vs_any(experiment, df_temp, "nga50",
+                       xlimits = xlimit, x_breaks = xbreaks, ylimits = ylimit, y_breaks = ybreaks, y_breaks_labels = ybreakslabs )
+miss=plotter_k_vs_any(experiment, df_temp, "misassemblies",
+                      xlimits = xlimit, x_breaks = xbreaks, ylimits = ylimit2, y_breaks = ybreaks2, y_breaks_labels = ybreakslabs2 )
 
-exp1_p = ggarrange(n50+ rremove("xlab"), ng50+ rremove("xlab"), nga50+ rremove("xlab"), miss,
-          labels = NULL,
-          align="hv",
-          ncol=1, nrow=4, common.legend = TRUE, legend="right")
+exp1_pp = ggarrange(n50+ rremove("xlab")+rremove("x.text"),##+rremove("ylab")+rremove("y.text"),
+                   ng50+ rremove("xlab")+rremove("x.text")+ggtitle(""),##+rremove("ylab")+rremove("y.text"),
+                   nga50+ rremove("xlab")+rremove("x.text")+ggtitle(""),##+rremove("ylab")+rremove("y.text"),
+                   miss+ ggtitle(""),##+rremove("ylab")+rremove("y.text"),
+                   labels = NULL,
+                   align="hv",
+                   ncol=1, nrow=4, common.legend = TRUE, legend="top")
+exp1_p = ggarrange(n50+ rremove("xlab")+rremove("x.text")+rremove("ylab")+rremove("y.text"),
+                   ng50+ rremove("xlab")+rremove("x.text")+ggtitle("")+rremove("ylab")+rremove("y.text"),
+                   nga50+ rremove("xlab")+rremove("x.text")+ggtitle("")+rremove("ylab")+rremove("y.text"),
+                   miss+ ggtitle("")+rremove("ylab")+rremove("y.text"),
+                   labels = NULL,
+                   align="hv",
+                   ncol=1, nrow=4, common.legend = TRUE, legend="top")
 ######
 experiment=exp2_n
 xlimit=c(68,112)
@@ -201,52 +231,100 @@ xbreaks=c(seq(70, 140, by = 10))
 
 df_temp = df[df[,"exp_n"]==experiment,]
 
-n50=plotter_k_vs_any(experiment, df_temp, "n50", xlimits = xlimit, x_breaks = xbreaks)
-ng50=plotter_k_vs_any(experiment, df_temp, "ng50", xlimits = xlimit, x_breaks = xbreaks)
-nga50=plotter_k_vs_any(experiment, df_temp, "nga50", xlimits = xlimit, x_breaks = xbreaks)
-miss=plotter_k_vs_any(experiment, df_temp, "misassemblies", xlimits = xlimit, x_breaks = xbreaks)
+n50=plotter_k_vs_any(experiment, df_temp, "n50",
+                     xlimits = xlimit, x_breaks = xbreaks, ylimits = ylimit, y_breaks = ybreaks, y_breaks_labels = ybreakslabs )
+ng50=plotter_k_vs_any(experiment, df_temp, "ng50",
+                      xlimits = xlimit, x_breaks = xbreaks, ylimits = ylimit, y_breaks = ybreaks, y_breaks_labels = ybreakslabs )
+nga50=plotter_k_vs_any(experiment, df_temp, "nga50",
+                       xlimits = xlimit, x_breaks = xbreaks, ylimits = ylimit, y_breaks = ybreaks, y_breaks_labels = ybreakslabs )
+miss=plotter_k_vs_any(experiment, df_temp, "misassemblies",
+                      xlimits = xlimit, x_breaks = xbreaks, ylimits = ylimit2, y_breaks = ybreaks2, y_breaks_labels = ybreakslabs2 )
 
-exp2_p = ggarrange(n50+ rremove("xlab"), ng50+ rremove("xlab"), nga50+ rremove("xlab"), miss,
+exp2_pp = ggarrange(n50+ rremove("xlab")+rremove("x.text"),##+rremove("ylab")+rremove("y.text"),
+                   ng50+ rremove("xlab")+rremove("x.text")+ggtitle(""),##+rremove("ylab")+rremove("y.text"),
+                   nga50+ rremove("xlab")+rremove("x.text")+ggtitle(""),##+rremove("ylab")+rremove("y.text"),
+                   miss+ ggtitle(""),##+rremove("ylab")+rremove("y.text"),
                    labels = NULL,
                    align="hv",
-                   ncol=1, nrow=4, common.legend = TRUE, legend="right")
+                   ncol=1, nrow=4, common.legend = TRUE, legend="top")
+exp2_p = ggarrange(n50+ rremove("xlab")+rremove("x.text")+rremove("ylab")+rremove("y.text"),
+                   ng50+ rremove("xlab")+rremove("x.text")+ggtitle("")+rremove("ylab")+rremove("y.text"),
+                   nga50+ rremove("xlab")+rremove("x.text")+ggtitle("")+rremove("ylab")+rremove("y.text"),
+                   miss+ ggtitle("")+rremove("ylab")+rremove("y.text"),
+                   labels = NULL,
+                   align="hv",
+                   ncol=1, nrow=4, common.legend = TRUE, legend="top")
 ######
 experiment=exp3_n
+
 xlimit=c(88,167)
 xbreaks=seq(90, 250, by = 15)
 
 df_temp = df[df[,"exp_n"]==experiment,]
 
-n50=plotter_k_vs_any(experiment, df_temp, "n50", xlimits = xlimit, x_breaks = xbreaks)
-ng50=plotter_k_vs_any(experiment, df_temp, "ng50", xlimits = xlimit, x_breaks = xbreaks)
-nga50=plotter_k_vs_any(experiment, df_temp, "nga50", xlimits = xlimit, x_breaks = xbreaks)
-miss=plotter_k_vs_any(experiment, df_temp, "misassemblies", xlimits = xlimit, x_breaks = xbreaks)
+n50=plotter_k_vs_any(experiment, df_temp, "n50",
+                     xlimits = xlimit, x_breaks = xbreaks, ylimits = ylimit, y_breaks = ybreaks, y_breaks_labels = ybreakslabs )
+ng50=plotter_k_vs_any(experiment, df_temp, "ng50",
+                      xlimits = xlimit, x_breaks = xbreaks, ylimits = ylimit, y_breaks = ybreaks, y_breaks_labels = ybreakslabs )
+nga50=plotter_k_vs_any(experiment, df_temp, "nga50",
+                       xlimits = xlimit, x_breaks = xbreaks, ylimits = ylimit, y_breaks = ybreaks, y_breaks_labels = ybreakslabs )
+miss=plotter_k_vs_any(experiment, df_temp, "misassemblies",
+                      xlimits = xlimit, x_breaks = xbreaks, ylimits = ylimit2, y_breaks = ybreaks2, y_breaks_labels = ybreakslabs2 )
 
-exp3_p = ggarrange(n50+ rremove("xlab"), ng50+ rremove("xlab"), nga50+ rremove("xlab"), miss,
+exp3_pp = ggarrange(n50+ rremove("xlab")+rremove("x.text"),##+rremove("ylab")+rremove("y.text"),
+                   ng50+ rremove("xlab")+rremove("x.text")+ggtitle(""),##+rremove("ylab")+rremove("y.text"),
+                   nga50+ rremove("xlab")+rremove("x.text")+ggtitle(""),##+rremove("ylab")+rremove("y.text"),
+                   miss+ ggtitle(""),##+rremove("ylab")+rremove("y.text"),
                    labels = NULL,
                    align="hv",
-                   ncol=1, nrow=4, common.legend = TRUE, legend="right")
+                   ncol=1, nrow=4, common.legend = TRUE, legend="top")
+exp3_p = ggarrange(n50+ rremove("xlab")+rremove("x.text")+rremove("ylab")+rremove("y.text"),
+                   ng50+ rremove("xlab")+rremove("x.text")+ggtitle("")+rremove("ylab")+rremove("y.text"),
+                   nga50+ rremove("xlab")+rremove("x.text")+ggtitle("")+rremove("ylab")+rremove("y.text"),
+                   miss+ ggtitle("")+rremove("ylab")+rremove("y.text"),
+                   labels = NULL,
+                   align="hv",
+                   ncol=1, nrow=4, common.legend = TRUE, legend="top")
 ######
 experiment=exp4_n
 xlimit=c(88,167)
-xbreaks=seq(90, 250, by = 30)
+xbreaks=seq(90, 250, by = 15)
 
 df_temp = df[df[,"exp_n"]==experiment,]
 
-n50=plotter_k_vs_any(experiment, df_temp, "n50", xlimits = xlimit, x_breaks = xbreaks)
-ng50=plotter_k_vs_any(experiment, df_temp, "ng50", xlimits = xlimit, x_breaks = xbreaks)
-nga50=plotter_k_vs_any(experiment, df_temp, "nga50", xlimits = xlimit, x_breaks = xbreaks)
-miss=plotter_k_vs_any(experiment, df_temp, "misassemblies", xlimits = xlimit, x_breaks = xbreaks)
+n50=plotter_k_vs_any(experiment, df_temp, "n50",
+                     xlimits = xlimit, x_breaks = xbreaks, ylimits = ylimit, y_breaks = ybreaks, y_breaks_labels = ybreakslabs )
+ng50=plotter_k_vs_any(experiment, df_temp, "ng50",
+                      xlimits = xlimit, x_breaks = xbreaks, ylimits = ylimit, y_breaks = ybreaks, y_breaks_labels = ybreakslabs )
+nga50=plotter_k_vs_any(experiment, df_temp, "nga50",
+                       xlimits = xlimit, x_breaks = xbreaks, ylimits = ylimit, y_breaks = ybreaks, y_breaks_labels = ybreakslabs )
+miss=plotter_k_vs_any(experiment, df_temp, "misassemblies",
+                      xlimits = xlimit, x_breaks = xbreaks, ylimits = ylimit2, y_breaks = ybreaks2, y_breaks_labels = ybreakslabs2 )
 
-exp4_p = ggarrange(n50+ rremove("xlab"), ng50+ rremove("xlab"), nga50+ rremove("xlab"), miss,
+exp4_pp = ggarrange(n50+ rremove("xlab")+rremove("x.text"),##+rremove("ylab")+rremove("y.text"),
+                   ng50+ rremove("xlab")+rremove("x.text")+ggtitle(""),##+rremove("ylab")+rremove("y.text"),
+                   nga50+ rremove("xlab")+rremove("x.text")+ggtitle(""),##+rremove("ylab")+rremove("y.text"),
+                   miss+ ggtitle(""),##+rremove("ylab")+rremove("y.text"),
                    labels = NULL,
                    align="hv",
-                   ncol=1, nrow=4, common.legend = TRUE, legend="right")
+                   ncol=1, nrow=4, common.legend = TRUE, legend="top")
+exp4_p = ggarrange(n50+ rremove("xlab")+rremove("x.text")+rremove("ylab")+rremove("y.text"),
+                   ng50+ rremove("xlab")+rremove("x.text")+ggtitle("")+rremove("ylab")+rremove("y.text"),
+                   nga50+ rremove("xlab")+rremove("x.text")+ggtitle("")+rremove("ylab")+rremove("y.text"),
+                   miss+ ggtitle("")+rremove("ylab")+rremove("y.text"),
+                   labels = NULL,
+                   align="hv",
+                   ncol=1, nrow=4, common.legend = TRUE, legend="top")
 ##################
 ##################
 
-ggarrange(exp1_p,exp2_p,exp3_p,exp4_p,
-          common.legend = TRUE, legend="right", ncol = 4)
+full_plot = ggarrange(exp1_p,exp2_p,exp3_p,exp4_p,
+                      common.legend = TRUE, legend="top", ncol = 4)
+
+file_name=paste(species, "_abyss_k-kc-sweeps.pdf", sep = "", collapse = NULL)
+ggsave(plot = full_plot, width = 14, height = 10, dpi = 300, filename = file_name)
+ggsave(plot = exp1_pp, width = 14, height = 10, dpi = 300, filename = "tags---.pdf")
+
 ######
 ##################################################################
 ## memory

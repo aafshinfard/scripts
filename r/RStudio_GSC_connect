@@ -1,0 +1,1 @@
+ssh -N -L 8787:gphost03.bcgsc.ca:8787 aafshinfard@ssh.bcgsc.ca
