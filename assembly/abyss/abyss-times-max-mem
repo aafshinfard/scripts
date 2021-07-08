@@ -1,1 +1,1 @@
-grep "Max" *.time | awk '{print $NF}' | sort -n -r
+grep "Max" *.time | awk '{print $NF}' | sort -n -r | head -n1 | awk '{print $1/(1024*1024)}'
