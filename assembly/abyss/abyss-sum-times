@@ -1,0 +1,1 @@
+/projects/btl/aafshinfard/scripts/vnikolic/abyss-get-times ./ | awk '{sum += $NF} END {print sum}'
