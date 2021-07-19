@@ -8,3 +8,10 @@ samtools index ${outbam}
                  - asm5/asm10/asm20: asm-to-ref mapping, for ~0.1/1/5% sequence divergence
                  - splice: long-read spliced alignment
                  - sr: genomic short-read mapping
+                 
+                 
+                
+outdir=minimap2_alg
+ref=/projects/btl_scratch/aafshinfard/projects/physlr/publication/drafts/grch38_no_Y_chromosome.fa
+outbam= ${asm}_algn.bam
+minimap2 -x asm5 -a --MD -L -Y -t 47 ${ref} ${asm} | samtools sort -T ${outdir}/tmp -O bam -o ${outbam}
