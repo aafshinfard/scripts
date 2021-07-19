@@ -10,7 +10,7 @@ samtools index ${outbam}
                  - sr: genomic short-read mapping
                  
                  
-                
+ # Example for a short-read assembly: (asm5)               
 outdir=minimap2_alg
 ref=/projects/btl_scratch/aafshinfard/projects/physlr/publication/drafts/grch38_no_Y_chromosome.fa
 asm=/projects/btl_scratch/aafshinfard/projects/abyss2.5/hsapiens/experiments/numbers/discovar/hpcg02_na12878_2x151/output/a.final/a.lines.fasta
