@@ -1,0 +1,10 @@
+# From Ka Ming:
+minimap2 -x splice -a --MD -L -Y -t 47 ${ref} ${reads} | samtools sort -T ${outdir}/tmp -O bam -o ${outbam}
+samtools index ${outbam}
+
+-x STR       preset (always applied before other options; see minimap2.1 for details) []
+                 - map-pb/map-ont: PacBio/Nanopore vs reference mapping
+                 - ava-pb/ava-ont: PacBio/Nanopore read overlap
+                 - asm5/asm10/asm20: asm-to-ref mapping, for ~0.1/1/5% sequence divergence
+                 - splice: long-read spliced alignment
+                 - sr: genomic short-read mapping
