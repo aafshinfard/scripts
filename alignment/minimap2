@@ -11,8 +11,14 @@ samtools index ${outbam}
                  
                  
  # Example for a short-read assembly: (asm5)               
-outdir=minimap2_alg
+
+
 ref=/projects/btl_scratch/aafshinfard/projects/physlr/publication/drafts/grch38_no_Y_chromosome.fa
-asm=/projects/btl_scratch/aafshinfard/projects/abyss2.5/hsapiens/experiments/numbers/discovar/hpcg02_na12878_2x151/output/a.final/a.lines.fasta
-outbam=${asm}_algn.bam
-minimap2 -x asm5 -a --MD -L -Y -t 47 ${ref} ${asm} | samtools sort -T ${outdir}/tmp -O bam -o ${outdir}/${outbam}
+asm_dir=/projects/btl_scratch/aafshinfard/projects/abyss2.5/hsapiens/experiments/numbers/discovar/hpcg02_na12878_2x151/output/a.final/
+asm_file=a.lines.fasta
+
+outdir=${asm_dir}${asm_file}_minimap2_algn/
+mkdir $outdir
+outbam=${outdir}_algn.bam
+minimap2 -x asm5 -a --MD -L -Y -t 47 ${ref} ${asm} | samtools sort -T ${outdir}/tmp -O bam -o ${outbam}
+samtools index ${outbam}
