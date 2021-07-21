@@ -19,6 +19,6 @@ asm_file=a.lines.fasta
 
 outdir=${asm_dir}${asm_file}_minimap2_algn/
 mkdir $outdir
-outbam=${outdir}_algn.bam
+outbam=${outdir}${asm_file}_algn.bam
 minimap2 -x asm5 -a --MD -L -Y -t 47 ${ref} ${asm_file} | samtools sort -T ${outdir}/tmp -O bam -o ${outbam}
 samtools index ${outbam}
