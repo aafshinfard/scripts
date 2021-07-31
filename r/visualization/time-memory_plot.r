@@ -17,13 +17,13 @@ plottera <- function(experiment, data, xlimits=0, ylimits=0, breaks_count=0,
   }
   range50 <- ggplot(data, aes("time", `mem`, 
                               color = tool, 
-                              shape = tool,#Sample,
+                              #shape = tool,#Sample,
                               fill = tool)) + #Algorithm)) 
     scale_color_manual(#name = "Algorithm", #"Tool", 
                        #values = c("black","deepskyblue1","seagreen2","goldenrod1")) + #indianred2
-                       values = c("black","mediumorchid3","black","turquoise3","goldenrod1")) +
-    scale_fill_manual(values = c("black","mediumorchid3","mediumorchid3","turquoise3","goldenrod1")) +
-    scale_shape_manual(values = c(1, 19, 21, 19, 19))+
+                       values = c("mediumorchid3","goldenrod1","black")) +
+    scale_fill_manual(values = c("mediumorchid3","goldenrod1","black")) +
+    #scale_shape_manual(values = c(1, 19, 21, 19, 19))+
     theme_minimal() +
     theme(
       axis.title = element_text(size = 14),
@@ -31,15 +31,15 @@ plottera <- function(experiment, data, xlimits=0, ylimits=0, breaks_count=0,
       legend.title = element_text(size=15),
       legend.text = element_text(size=14)
     ) +
-    xlab("Wall clock time (hours)") + ylab("Peak memory (GB)") +
-    scale_x_continuous(limits = xlimits,
-                       breaks=x_breaks, labels=x_breaks_labels)+
-    scale_y_continuous(limits = ylimits,
-                       #breaks=c(0,5e6,10e6,15e6,20e6,25e6,30e6,40e6,50e6,60e6,70e6,80e6 ),
-                       breaks=y_breaks,
-                       #labels=c("0","5 Mb","10 Mb","15 Mb","20 Mb","25 Mb","30 Mb","40 Mb",
-                       #        "50 Mb","60 Mb","70 Mb","80 Mb") )
-                       labels=y_breaks_labels )
+    xlab("Wall clock time (seconds)") + ylab("Peak memory (GB)")+
+    scale_x_continuous(limits = c(0,3000))+#,
+    #                   breaks=x_breaks, labels=x_breaks_labels)+
+    scale_y_continuous(limits = c(0,15))# ylimits),
+    #                   #breaks=c(0,5e6,10e6,15e6,20e6,25e6,30e6,40e6,50e6,60e6,70e6,80e6 ),
+    #                   breaks=y_breaks,
+    #                   #labels=c("0","5 Mb","10 Mb","15 Mb","20 Mb","25 Mb","30 Mb","40 Mb",
+    #                   #        "50 Mb","60 Mb","70 Mb","80 Mb") )
+    #                   labels=y_breaks_labels )
   #labels=c("0","5","10","15","20","25","30","40", "50","60","70","80") )
   #return (range50)
   frange50 <- range50 + geom_point(aes(x=time, y= mem), size=7, stroke = 1) + ggtitle(experiment) +
@@ -53,6 +53,23 @@ plottera <- function(experiment, data, xlimits=0, ylimits=0, breaks_count=0,
     )
   return (frange50)
 }
+
+ad_sum="/projects/btl_scratch/aafshinfard/projects/abyss2.5/ecoli/run-summary.tsv"
+df_temp = read.table(ad_sum, header = FALSE, sep = "|", colClasses = c("character","character","character","numeric","numeric","character"))
+df = df_temp[,c(2,3,4,5)]
+df2=df
+
+colnames(df2)=c("group","tool","time","mem")
+
+p1=plottera(experiment, df2[df2[,1]==" 2x100 ",])+theme(legend.position = "none")
+p2=plottera(experiment, df2[df2[,1]==" 2x150 ",])+theme(legend.position = "none")
+p3=plottera(experiment, df2[df2[,1]==" 2x300 ",])+theme(legend.position = "none")
+
+
+grid.arrange(p1, p2, p3,ncol=3)
+
+#read.table(ad_sum, header = FALSE, sep = "|", skip = 0, as.is = c(2,3,4,5,6,7,8,9,10), colClasses = c("character","character","numeric","numeric","numeric","numeric","character","character","character","character","character"))
+
 
 
 tool = c(

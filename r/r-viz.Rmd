@@ -302,7 +302,8 @@ countries %>%
   ggplot(aes(x=continent, y=lifeExp, fill=continent))+
     geom_violin()+
     labs(title="Distribution of life expenctancy by continent",x="Continent", y="Life expectancy")+
-    facet_wrap(~year)
+    facet_wrap(~year)+
+    theme(axis.text.x = element_text(angle = 90))
 ```
 
 
@@ -365,10 +366,10 @@ countries %>%
 Transform the gdpPercap variable using a `scale_x_log10()`
 ```{r}
 countries %>%
-  ggplot(aes(x=gdpPercap, y=lifeExp))+
+  ggplot(aes(x=log(gdpPercap), y=lifeExp))+
     geom_point(aes(color=continent,size=pop))+
-    labs(title="Scatterplot of GDP per capita and life expectancy", x="Log 10 of GDP per capita", y="Life expectancy")+
-    scale_x_log10()
+    labs(title="Scatterplot of GDP per capita and life expectancy", y="Life expectancy")
+    #scale_x_log10()
 ```
 
 
@@ -419,7 +420,8 @@ countries %>%
     labs(title="Best-fit lines between gdpPercap(log10) and lifeExp for each continent",
          x="Log 10 of GDP per capita", y="Life expectancy")+
     scale_x_log10()+
-    geom_smooth(color="black",method="lm",se=FALSE)
+    geom_smooth(color="black",method="lm",se=FALSE)+
+    facet_wrap(~continent)
 
 ```
 
@@ -465,7 +467,8 @@ countries %>%
     geom_smooth(aes(color=continent), method="lm",se=FALSE)+
     scale_x_log10()+
     labs(title="Best-fit lines between gdpPercap(log10) and lifeExp for each continent",
-         x="Log 10 of GDP per capita", y="Life expectancy")
+         x="Log 10 of GDP per capita", y="Life expectancy")+
+  theme_minimal()
 
 ```
 
