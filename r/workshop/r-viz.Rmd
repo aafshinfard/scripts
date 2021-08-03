@@ -303,7 +303,7 @@ countries %>%
     geom_violin()+
     labs(title="Distribution of life expenctancy by continent",x="Continent", y="Life expectancy")+
     facet_wrap(~year)+
-    theme(axis.text.x = element_text(angle = 90))
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 
 
