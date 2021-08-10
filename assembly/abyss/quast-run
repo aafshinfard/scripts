@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+
+import argparse
+import subprocess as sp
+import sys
+import os
+from os.path import join, isfile, isdir
+import shutil
+
+def get_cli_args():
+  parser = argparse.ArgumentParser(epilog="Any extra options will be passed to QUAST.")
+
+  parser.add_argument('-t', '--threads', help="Number of threads to use.", type=int, default=48)
+
+  return parser.parse_known_args()
+
+def check_cmd_available(cmd):
+  assert len(cmd.split()) == 1
+  if sp.run([ f'command -v {cmd} &> /dev/null' ], shell=True).returncode != 0:
+    print(f"{cmd} not found in PATH.")
+    sys.exit(-1)
+
+if __name__ == "__main__":
+  scriptargs, extraargs = get_cli_args()
+
+  check_cmd_available('bwa')
+  check_cmd_available('minimap2')
+
+  print("=== Versions ===")
+  print(sp.run([ '/projects/btl/aafshinfard/tools/quast/quast-5.0.2/quast.py -v' ], shell=True, capture_output=True).stdout.decode().strip())
+  print('bwa ', end='')
+  print(sp.run([ 'bwa 2>&1 | grep Version' ], shell=True, capture_output=True).stdout.decode().strip())
+  print('minimap2 ', end='')
+  print(sp.run([ 'minimap2 --version' ], shell=True, capture_output=True).stdout.decode().strip())
+  print("================")
+
+  extraargs_str = ' '.join(extraargs)
+
+  sp.run([ f'/usr/bin/time -pv /projects/btl/aafshinfard/tools/quast/quast-5.0.2/quast.py --threads {scriptargs.threads} {extraargs_str}' ], shell=True)

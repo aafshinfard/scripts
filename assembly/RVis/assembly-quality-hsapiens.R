@@ -13,6 +13,7 @@ setAs("character", "num.with.commas",
 #experiment="abyss2.5 2x100"
 ad_reads2x100="/projects/btl_scratch/aafshinfard/projects/abyss2.5/hsapiens/experiments/results_na12878.tsv";
 ad_reads2x150="/projects/btl_scratch/aafshinfard/projects/abyss2.5/hsapiens/experiments/results_na24631.tsv";
+
 ad_reads2x301="/projects/btl_scratch/aafshinfard/projects/abyss2.5/hsapiens/experiments/results_na24143.tsv";
 ad_na24835="/projects/btl_scratch/aafshinfard/projects/abyss2.5/hsapiens/experiments/results_na24835.tsv";
 
@@ -154,12 +155,44 @@ na24385=dodger(d_na24385)
 reads100=dodger(reads100)
 
 
+
+##########################################################################
+##########################################################################
+##########################################################################
+##################### Manual changes:
+
+
+levels(na12878$tool)=c(levels(na12878$tool),"Abyss-new")
+na12878[2,'tool']="Abyss-new"
+na12878[2,'ng50']=81524
+na12878[2,'nga50']=80442
+na12878[2,'misassemblies']=713
+
+levels(na24631$tool)=c(levels(na24631$tool),"Abyss-new")
+na24631[2,'tool']=as.factor("Abyss-new")
+na24631[2,'ng50']=68667
+na24631[2,'nga50']=68120
+na24631[2,'misassemblies']=513
+
+levels(na24143$tool)=c(levels(na24143$tool),"Abyss-new")
+na24143[2,'tool']="Abyss-new"
+na24143[2,'ng50']=72967
+na24143[2,'nga50']=72550
+na24143[2,'misassemblies']=326
+
+levels(na24385$tool)=c(levels(na24385$tool),"Abyss-new")
+na24385[2,'tool']="Abyss-new"
+na24385[2,'ng50']=77884
+na24385[2,'nga50']=77309
+na24385[2,'misassemblies']=426
+
+
 ylimits_general = c(0,200000)
 
 
 #aq300sub = aq[aq[,'Seq..and.Assembly']=="2x300sub",]
 
-xlimits = c(0,3000)
+xlimits = c(0,2200)
 xbreaks = seq(0, 5000, by = 1000)
 xbreaks_l = xbreaks
 #xbreaks_l = c("500", "1000", "1500", "2000", "2500", "3000", "3500", "4000", "4500", "5000" )
@@ -171,6 +204,16 @@ ylimits2 = c(0,195000)
 experiment = "na12878"
 legend_na12878_plot = plotter1(experiment, na12878, xlimits, ylimits1, x_breaks = xbreaks, x_breaks_labels = xbreaks_l)
 ggsave(plot = legend_na12878_plot, width = 5.5, height = 6, dpi = 300, filename = "hsapiens_legend1.pdf")
+
+experiment = "na24631"
+legend_na24631_plot = plotter1(experiment, na24631, xlimits, ylimits1, x_breaks = xbreaks, x_breaks_labels = xbreaks_l)
+ggsave(plot = legend_na24631_plot, width = 5.5, height = 6, dpi = 300, filename = "hsapiens_legend1.pdf")
+xlimits = c(0,1600)
+experiment = "na24385"
+legend_na24385_plot = plotter1(experiment, na24385, xlimits, ylimits2, x_breaks = xbreaks, x_breaks_labels = xbreaks_l)
+ggsave(plot = legend_na24385_plot, width = 5.5, height = 6, dpi = 300, filename = "hsapiens_legend1.pdf")
+xlimits = c(0,1200)
+experiment = "na24143"
 legend_na24143_plot = plotter1(experiment, na24143, xlimits, ylimits2, x_breaks = xbreaks, x_breaks_labels = xbreaks_l)
 ggsave(plot = legend_na24143_plot, width = 5.5, height = 6, dpi = 300, filename = "hsapiens_legend2.pdf")
 

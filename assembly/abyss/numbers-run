@@ -1,0 +1,74 @@
+#!/bin/bash
+#SBATCH --partition=upgrade
+#SBATCH --ntasks=48
+#SBATCH --mem=220G
+#SBATCH --exclusive
+#SBATCH --exclude='n[121-124,129-132,224-228]'
+
+# Code borrowed from btl-scripts - https://github.com/bcgsc
+
+# source
+source ~/.bashrc
+
+# Sane defaults
+set -o errexit -o pipefail -o noclobber -o nounset
+
+if [[ $# -lt 1 ]]; then
+  echo "Usage: $(basename $0) <exe> [arg1] [arg2] ..."
+  exit 1
+fi
+
+# Escape string to use for passing to the slurm job/eval
+function escape() {
+  printf '%q ' "$@"
+}
+
+# Unescape an escaped string (for use in eval)
+function unescape() {
+  eval printf '%s\ ' "$@"
+}
+
+if [[ -z ${BTL_SCRIPTS_NUMBERS_RUN+1} ]]; then # Queue the slurm job
+  # Make sure the <exe> provided is found in PATH
+  for arg in $1; do command -v $arg &> /dev/null || { echo "$arg not found in PATH."; exit 1; }; break; done
+
+  # Get the path to this script so that it can be ran as a job in slurm
+  script_path="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; echo $PWD )"/$(basename $0)
+
+  # Logfile names for the job
+  stdout_log=${PWD}/%x-%j.out
+  stderr_log=${PWD}/%x-%j.err
+
+  # Job name for slurm
+  if [[ -z ${BTL_SCRIPTS_NUMBERS_RUN_JOBNAME+1} ]]; then
+    jobname=$(printf '%q' $(basename "$1"))
+  else
+    jobname=${BTL_SCRIPTS_NUMBERS_RUN_JOBNAME}
+  fi
+
+  # Escape the provided executable and its args. Double escape prevents some bugs with unescaping
+  target_cmd="$(escape "$(escape "$@")")"
+
+  # SSH into numbers and submit the job
+  ssh numbers "cd $PWD; sbatch -J "$jobname" -o "$stdout_log" -e "$stderr_log" --export=ALL,BTL_SCRIPTS_NUMBERS_RUN=1 $script_path $target_cmd"
+else # Run within the slurm job
+  # If the passed arguments are separated in array, they should be directly evaluable
+  if [[ $# -gt 1 ]]; then
+    program="$1"
+    shift
+    $program "$@"
+  elif [[ $# -eq 1 ]]; then
+    # If it's a single argument, we need to check whether it's an escaped string of executable and its args
+    # or the command was simply issued as a single string. The `sed` here removes escapes and contracts the string.
+    words=$(echo "$1" | sed 's~\\.~~g')
+    wordcount=0
+    for word in $words; do wordcount=$((wordcount+1)); done
+    # If the word count is more than one, it was a command in a string.
+    # Otherwise, it was an escaped string that sed contracted.
+    if [[ $wordcount -gt 1 ]]; then
+      eval $@
+    else
+      eval "$(unescape "$@")"
+    fi
+  fi
+fi
