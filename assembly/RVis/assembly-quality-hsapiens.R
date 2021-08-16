@@ -193,7 +193,7 @@ ylimits_general = c(0,200000)
 #aq300sub = aq[aq[,'Seq..and.Assembly']=="2x300sub",]
 
 xlimits = c(0,2200)
-xbreaks = seq(0, 5000, by = 1000)
+xbreaks = seq(0, 5000, by = 500)
 xbreaks_l = xbreaks
 #xbreaks_l = c("500", "1000", "1500", "2000", "2500", "3000", "3500", "4000", "4500", "5000" )
 
@@ -208,6 +208,7 @@ ggsave(plot = legend_na12878_plot, width = 5.5, height = 6, dpi = 300, filename 
 experiment = "na24631"
 legend_na24631_plot = plotter1(experiment, na24631, xlimits, ylimits1, x_breaks = xbreaks, x_breaks_labels = xbreaks_l)
 ggsave(plot = legend_na24631_plot, width = 5.5, height = 6, dpi = 300, filename = "hsapiens_legend1.pdf")
+
 xlimits = c(0,1600)
 experiment = "na24385"
 legend_na24385_plot = plotter1(experiment, na24385, xlimits, ylimits2, x_breaks = xbreaks, x_breaks_labels = xbreaks_l)
