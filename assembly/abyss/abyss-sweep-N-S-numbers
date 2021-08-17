@@ -1,0 +1,150 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+from os.path import join
+import shutil
+import copy
+import subprocess
+import argparse
+import math
+import uuid, base64
+
+ARGS_FILE = 'args'
+
+abyss_run_params = [
+  'in', 'lib', 'pe', 'mp', 'se', 'B', 'k', 'kc', 'base_assembly','l','S','N',
+  'abyss_bin', 'quast_args', 'RRESOLVER_OPTIONS', 'ref',
+  'lineage_dataset', 'name', 'H', 'verbose', 'threads', 'targets',
+]
+
+new_params = [
+  'kc_start', 'kc_end', 'kc_step', 'k_start', 'k_end', 'k_step', 'N_start', 'N_end', 'N_step', 'derived_assembly', 'suffix', 'continue'
+]
+
+file_args = {}
+if os.path.exists(ARGS_FILE):
+  with open(ARGS_FILE, 'r') as f:
+    for line in f:
+      if line.strip() == '': continue
+      tokens = line.strip().split('=')
+      if tokens[0][0] == '#': continue
+      if len(tokens[1]) >= 2 and tokens[1][0] == '\"' and tokens[1][-1] == '\"': tokens[1] = tokens[1][1:-1]
+      if tokens[1] == '': tokens[1] = None
+      file_args[tokens[0]] = tokens[1]
+else:
+  print("No args file found!")
+  sys.exit(-1)
+
+def get_random_suffix():
+  return base64.urlsafe_b64encode(uuid.uuid4().bytes).rstrip(b'=').decode('ascii')
+
+def get_suffix(args):
+  if 'suffix' in args and args['suffix'] != None:
+    return args['suffix']
+  else:
+    return get_random_suffix()
+
+def get_basic_assembly_dirname3(k, kc, B, S):
+  return 'assembly-k{}-kc{}-B{}-S{}'.format(k, kc, B, S)
+
+def get_basic_assembly_dirname4(k, kc, N, B, S):
+  return 'assembly-k{}-kc{}-N{}-B{}-S{}'.format(k, kc, N, B, S)
+
+args = file_args
+assert 'kc_start' in args
+assert 'kc_end' in args
+assert 'kc_step' in args
+assert 'k_start' in args
+assert 'k_end' in args
+assert 'k_step' in args
+assert 'B' in args
+
+def is_derived_assembly(args):
+  return 'derived_assembly' in args and args['derived_assembly'] != None
+
+def is_continued_assembly(args):
+  return 'continue' in args and args['continue'].lower() == 'true'
+
+if not is_derived_assembly(args) and not is_continued_assembly(args):
+  for kc in range(int(args['kc_start']), int(args['kc_end']) + 1, int(args['kc_step'])):
+    for k in range(int(args['k_start']), int(args['k_end']) + 1, int(args['k_step'])):
+      if 'N_start' in args and 'N_end' in args and 'N_step' in args:
+        for N in range(int(args['N_start']), int(args['N_end']) + 1, int(args['N_step'])):
+          assembly_dir = get_basic_assembly_dirname4(k, kc, N, args['B'], args['S'])
+          assert not os.path.exists(assembly_dir)
+      else:
+        assembly_dir = get_basic_assembly_dirname3(k, kc, args['B'], args['S'])
+        assert not os.path.exists(assembly_dir)
+
+for kc in range(int(args['kc_start']), int(args['kc_end']) + 1, int(args['kc_step'])):
+  for k in range(int(args['k_start']), int(args['k_end']) + 1, int(args['k_step'])):
+    if 'N_start' in args and 'N_end' in args and 'N_step' in args:
+      for N in range(int(args['N_start']), int(args['N_end']) + 1, int(args['N_step'])):
+        basic_assembly_dirname = get_basic_assembly_dirname4(k, kc, N, args['B'], args['S'])
+        assembly_dir = copy.deepcopy(basic_assembly_dirname)
+
+        abyss_run_args = [ '-k', str(k), '--kc', str(kc), '-N', str(N) ]
+        for key in args.keys():
+          if key in new_params: continue
+          arg = args[key]
+          if arg != None:
+            if len(arg) >= 2 and arg[:2] == '--': arg = "\"" + arg + "\""
+            if key in abyss_run_params:
+              if len(key) == 1:
+                param = '-' + key
+              else:
+                param = '--'
+                if key.isupper():
+                  param += key
+                else:
+                  param += key.lower().replace(' ', '-').replace('_', '-')
+              if key == 'verbose':
+                abyss_run_args += [ str(param) ] * int(arg)
+              else:
+                abyss_run_args += [ str(param), str(arg) ]
+            else:
+              abyss_run_args += [ '{}={}'.format(key, arg) ]
+
+        if is_derived_assembly(args):
+          assembly_dir += '-' + get_suffix(args)
+          abyss_run_args += [ '--base-assembly', '../' + str(basic_assembly_dirname) ]
+
+        os.makedirs(assembly_dir, exist_ok=True)
+        os.chdir(assembly_dir)
+        subprocess.run([ 'numbers-run', 'abyss-run' ] + abyss_run_args)
+        os.chdir('..')
+    else:
+      basic_assembly_dirname = get_basic_assembly_dirname3(k, kc, args['B'], args['S'])
+      assembly_dir = copy.deepcopy(basic_assembly_dirname)
+
+      abyss_run_args = [ '-k', str(k), '--kc', str(kc) ]
+      for key in args.keys():
+        if key in new_params: continue
+        arg = args[key]
+        if arg != None:
+          if len(arg) >= 2 and arg[:2] == '--': arg = "\"" + arg + "\""
+          if key in abyss_run_params:
+            if len(key) == 1:
+              param = '-' + key
+            else:
+              param = '--'
+              if key.isupper():
+                param += key
+              else:
+                param += key.lower().replace(' ', '-').replace('_', '-')
+            if key == 'verbose':
+              abyss_run_args += [ str(param) ] * int(arg)
+            else:
+              abyss_run_args += [ str(param), str(arg) ]
+          else:
+            abyss_run_args += [ '{}={}'.format(key, arg) ]
+
+      if is_derived_assembly(args):
+        assembly_dir += '-' + get_suffix(args)
+        abyss_run_args += [ '--base-assembly', '../' + str(basic_assembly_dirname) ]
+
+      os.makedirs(assembly_dir, exist_ok=True)
+      os.chdir(assembly_dir)
+      subprocess.run([ 'numbers-run', 'abyss-run' ] + abyss_run_args)
+      os.chdir('..')
