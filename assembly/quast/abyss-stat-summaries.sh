@@ -1,3 +1,4 @@
+#!/bin/bash
 # by Amirhossein Afshinfard 
 # afshinfard @ github / aafshinfard @ github
 # aafshinfard@gmail.com
