@@ -9,7 +9,6 @@ df = data.frame(m)
 colnames(df)=c("step",
                "total_time_min",
                "time_hr",
-               "time_min",
                "time_sec",
                "mem",
                "pl")
@@ -124,32 +123,39 @@ for (i in 1:length(sorted_time_files))
     }
   }
 }
-
-df2=df
-
+#df=df0
+df0=df
+df2=df0
 df2$step="WP2  with mibf 1 level 0.1 occupancy"
-df2$total_time_min=
-df2$time_hr=
-df2$time_min=
-df2$time_sec=
+df2$total_time_min=16.48
+df2$time_hr=0
+df2$time_min=16
+df2$time_sec=28
 df2$mem=4473032
-df2$pl=
+df2$pl="x"
 
-  df2$step="WP2 with hash table 3 levels"
-df2$total_time_min=
-  df2$time_hr=
-  df2$time_min=
-  df2$time_sec=
-  df2$mem=22234104
-df2$pl=
-  
-  df2$step="WP2 with 32 bit id vector 3 levels 0.1 occupancy"
-df2$total_time_min=
-  df2$time_hr=
-  df2$time_min=
-  df2$time_sec=
-  df2$mem=5350588
-df2$pl=
+df[1,]=df2
+
+df2=df0  
+df2$step="WP2 with hash table 3 levels"
+df2$total_time_min=18.76
+df2$time_hr=0
+df2$time_min=18
+df2$time_sec=46
+df2$mem=22234104
+df2$pl="x"
+df[2,]=df2
+
+df2=df0
+df2$step="WP2 with 32 bit id vector 3 levels 0.1 occupancy"
+df2$total_time_min=3.5
+df2$time_hr=0
+df2$time_min=3
+df2$time_sec=31
+df2$mem=5350588
+df2$pl="x"
+df[3,]=df2
+
 
 df_temp = df
 df = df_temp
@@ -268,14 +274,8 @@ if (dim(df)[1] == 0) {
     xlab("Physlr Step") +
     scale_color_manual(values = c("#008000", "#8E44AD", "#2E86C1", "#808080"))
 }
-```
 
-
-## Data to be plotted
-
-```{r}
 df[,c(1,3,4,6,7)]
-```
 
 
 ## Time:
