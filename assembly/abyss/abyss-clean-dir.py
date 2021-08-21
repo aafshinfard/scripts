@@ -7,9 +7,30 @@ import shutil
 import subprocess
 from os.path import join
 
+def parse_arguments():
+        "Parse the command line arguments."
+        argparser = argparse.ArgumentParser()
+        argparser.add_argument(
+            "-t", "--threads", action="store", dest="threads", type=int,
+            default=min(16, os.cpu_count()),
+            help="number of threads [16 or number of CPU]")
+        argparser.add_argument(
+            "--name", action="store", dest="name", type=str, default="assembly",
+            help="prefix name of assemblies to keep.")
+        argparser.add_argument(
+            "--mode", action="store", dest="mode", type=str, default="normal",
+            choices=["deep", "normal", "light"],
+            help="Mode of cleaning the files/dirs."
+                 "Accepted values are: deep (only \"name\"-8.fa), normal (+ quast results), or light (+ \"name\"-1.fa) [normal].")
+        return argparser.parse_args()
+      
+      
+      
+
 ARGS_FILE = 'args'
 args = {
   'name' : 'assembly'
+  'deep': 'no'
 }
 
 for file in os.listdir('.'):
