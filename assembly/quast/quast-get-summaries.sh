@@ -3,11 +3,8 @@
 # afshinfard @ github / aafshinfard @ github
 # aafshinfard@gmail.com
 
-# incomplete
-
-#dir_pattern="2x*/*quast/"
-dir_pattern="assembly-k*/*quast-*/"
-
+# Input:
+dir_pattern=${1:-"assembly-k*/*quast-*/"}
 
 #### Summarize in Vlad's style
 # credits for quast-get-summary: @vnikolic
