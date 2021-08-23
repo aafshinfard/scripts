@@ -1,5 +1,8 @@
 #!/bin/bash
-dir_pattern="na24*S*"
+# inputs:
+# 1 - dir_pattern: pattern of directories to run quast-get-summaries and abyss-stat-summaries in (they may contain multiple or single assembly directories themselves)
+
+dir_pattern=${1:"na24*S*"}
 
 #### Rerun "abyss-stat-summaries" and "quast-get-summaries" for all directories that match the pattern
 
