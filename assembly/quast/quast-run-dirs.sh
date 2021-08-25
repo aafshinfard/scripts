@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dir_pattern=${1:-"assembly-k*/*quast-*/"}
+dir_pattern=${1:-"assembly-k*/"}
 t=${2:-48}
 
 root_dir=$(pwd)
