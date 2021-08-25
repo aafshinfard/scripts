@@ -1,7 +1,9 @@
 #!/bin/bash
 
-dir_pattern=${1:-"assembly-k*/"}
-t=${2:-48}
+ref=${1:-"/projects/btl/datasets/ecoli/NC_000913.3_K12_MG1655.fa"}
+file=${2:-"assembly-scaffolds.fa"}
+dir_pattern=${3:-"assembly-k*/"}
+t=${4:-48}
 
 root_dir=$(pwd)
 for d in ${dir_pattern} ; do
