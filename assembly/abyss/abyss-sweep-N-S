@@ -13,7 +13,7 @@ import uuid, base64
 ARGS_FILE = 'args'
 
 abyss_run_params = [
-  'in', 'lib', 'pe', 'mp', 'se', 'B', 'k', 'kc', 'base_assembly','l','S','N','n',
+  'in', 'lib', 'pe', 'mp', 'se', 'B', 'k', 'kc', 'base_assembly','l','S','N',
   'abyss_bin', 'quast_args', 'RRESOLVER_OPTIONS', 'ref',
   'lineage_dataset', 'name', 'H', 'verbose', 'threads', 'targets',
 ]
@@ -45,11 +45,11 @@ def get_suffix(args):
   else:
     return get_random_suffix()
 
-def get_basic_assembly_dirname3(k, kc, B):
-  return 'assembly-k{}-kc{}-B{}'.format(k, kc, B)
+def get_basic_assembly_dirname3(k, kc, B, S):
+  return 'assembly-k{}-kc{}-B{}-S{}'.format(k, kc, B, S)
 
-def get_basic_assembly_dirname4(k, kc, N, B):
-  return 'assembly-k{}-kc{}-N{}-B{}'.format(k, kc, N, B)
+def get_basic_assembly_dirname4(k, kc, N, B, S):
+  return 'assembly-k{}-kc{}-N{}-S{}-B{}'.format(k, kc, N, B, S)
 
 args = file_args
 assert 'kc_start' in args
@@ -71,17 +71,17 @@ if not is_derived_assembly(args) and not is_continued_assembly(args):
     for k in range(int(args['k_start']), int(args['k_end']) + 1, int(args['k_step'])):
       if 'N_start' in args and 'N_end' in args and 'N_step' in args:
         for N in range(int(args['N_start']), int(args['N_end']) + 1, int(args['N_step'])):
-          assembly_dir = get_basic_assembly_dirname4(k, kc, N, args['B'])
+          assembly_dir = get_basic_assembly_dirname4(k, kc, N, args['B'], args['S'])
           assert not os.path.exists(assembly_dir)
       else:
-        assembly_dir = get_basic_assembly_dirname3(k, kc, args['B'])
+        assembly_dir = get_basic_assembly_dirname3(k, kc, args['B'], args['S'])
         assert not os.path.exists(assembly_dir)
 
 for kc in range(int(args['kc_start']), int(args['kc_end']) + 1, int(args['kc_step'])):
   for k in range(int(args['k_start']), int(args['k_end']) + 1, int(args['k_step'])):
     if 'N_start' in args and 'N_end' in args and 'N_step' in args:
       for N in range(int(args['N_start']), int(args['N_end']) + 1, int(args['N_step'])):
-        basic_assembly_dirname = get_basic_assembly_dirname4(k, kc, N, args['B'])
+        basic_assembly_dirname = get_basic_assembly_dirname4(k, kc, N, args['B'], args['S'])
         assembly_dir = copy.deepcopy(basic_assembly_dirname)
 
         abyss_run_args = [ '-k', str(k), '--kc', str(kc), '-N', str(N) ]
@@ -115,7 +115,7 @@ for kc in range(int(args['kc_start']), int(args['kc_end']) + 1, int(args['kc_ste
         subprocess.run([ 'abyss-run' ] + abyss_run_args)
         os.chdir('..')
     else:
-      basic_assembly_dirname = get_basic_assembly_dirname3(k, kc, args['B'])
+      basic_assembly_dirname = get_basic_assembly_dirname3(k, kc, args['B'], args['S'])
       assembly_dir = copy.deepcopy(basic_assembly_dirname)
 
       abyss_run_args = [ '-k', str(k), '--kc', str(kc) ]
