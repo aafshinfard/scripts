@@ -4,7 +4,7 @@
 # aafshinfard@gmail.com
 
 # Input:
-dir_pattern=${1:-"assembly-k*/*quast-*/"}
+dir_pattern=${1:-"assembly-k*/*quast*/"}
 
 #### Summarize in Vlad's style
 # credits for quast-get-summary: @vnikolic
