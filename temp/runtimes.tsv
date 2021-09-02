@@ -1,23 +1,26 @@
-| Ecoli 2x100| SPAdes         | 160 | 12.11 |
-| Ecoli 2x100| Unicycler (ec) | 2299 | 12.11 |
-| Ecoli 2x100| ABySS 2.5      | 179 | 2.35 |
+| Ecoli 2x100| SPAdes         | 160 | 12.11 | tan2 | 3 |
+| Ecoli 2x100| Unicycler (ec) | 2299 | 12.11 | dodgeblue4 | 2 |
+| Ecoli 2x100| ABySS 2.5      | 179 | 2.35 | darkgoldenrod1 | 1 |
+| Ecoli 2x100| DiscovarDeNovo | 136 | 8.51 | indianred2 | 4 |
 
-| Ecoli 2x250| SPAdes         | 211 | 6.85 |
-| Ecoli 2x250| Unicycler (ec) | 1335 | 7.83 |
-| Ecoli 2x250| ABySS 2.5      | 75 | 3.96 |
+| Ecoli 2x150| SPAdes         | 211 | 6.85 | tan2 | 3 |
+| Ecoli 2x150| Unicycler (ec) | 1335 | 7.83 | dodgeblue4 | 2 |
+| Ecoli 2x150| ABySS 2.5      | 75 | 3.96 | darkgoldenrod1 | 1 |
+| Ecoli 2x150| DiscovarDeNovo | 96 | 11.72 | indianred2 | 4 |
 
-| Ecoli 2x301| SPAdes         | 734 | 13.14 |
-| Ecoli 2x301| Unicycler (ec) | 1465 | 11.65 |
-| Ecoli 2x301| ABySS 2.5      | 64 | 4.17 |
+| Ecoli 2x301| SPAdes         | 734 | 13.14 | tan2 | 3 |
+| Ecoli 2x301| Unicycler (ec) | 1465 | 11.65 | dodgeblue4 | 2 | 
+| Ecoli 2x301| ABySS 2.5      | 64 | 4.17 | darkgoldenrod1 | 1 |
+| Ecoli 2x301| DiscovarDeNovo | 70 | 14.42 | indianred2 | 4 |
 
-| OSativa | DiscovarDeNovo  | 146 | 611 | 
-| OSativa | ABySS 2.5       | 251 | 13 |
-| OSativa | Megahit         | 114 | 20 | 
+| OSativa | ABySS 2.5       | 251 | 13 | darkgoldenrod1 |  1 |
+| OSativa | DiscovarDeNovo  | 146 | 611 | indianred2 | 4 |
+| OSativa | Megahit         | 114 | 20 | aquamarine3 | 5 |
 
-| na12878 | ABySS 2.5       | 833 | 45 |
-| na12878 | DiscovarDeNovo  | 600 | 1672 |
-| na12878 | Megahit         | 667 | 104 |
+| na12878 | ABySS 2.5       | 833 | 45 | darkgoldenrod1 |  1 |
+| na12878 | DiscovarDeNovo  | 600 | 1672 | indianred2 | 4 |
+| na12878 | Megahit         | 667 | 104 | aquamarine3 | 5 |
 
-| na24631 | ABySS 2.5       | 645 | 45 |
-| na24631 | DiscovarDeNovo  | 580 | 1624 |
-| na24631 | Megahit         | 622 | 97 |
+| na24631 | ABySS 2.5       | 645 | 45 | darkgoldenrod1 | 1 |
+| na24631 | DiscovarDeNovo  | 580 | 1624 | indianred2 | 4 | 
+| na24631 | Megahit         | 622 | 97 | aquamarine3 | 5 |
