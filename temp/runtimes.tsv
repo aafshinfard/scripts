@@ -1,5 +1,23 @@
-| Ecoli 2x100| 
+| Ecoli 2x100| SPAdes         | 160 | 12.11 |
+| Ecoli 2x100| Unicycler (ec) | 2299 | 12.11 |
+| Ecoli 2x100| ABySS 2.5      | 179 | 2.35 |
 
-| Ecoli 2x250|
+| Ecoli 2x250| SPAdes         | 211 | 6.85 |
+| Ecoli 2x250| Unicycler (ec) | 1335 | 7.83 |
+| Ecoli 2x250| ABySS 2.5      | 75 | 3.96 |
 
-| Ecoli 2x301|
+| Ecoli 2x301| SPAdes         | 734 | 13.14 |
+| Ecoli 2x301| Unicycler (ec) | 1465 | 11.65 |
+| Ecoli 2x301| ABySS 2.5      | 64 | 4.17 |
+
+| OSativa | DiscovarDeNovo  | 146 | 611 | 
+| OSativa | ABySS 2.5       | 251 | 13 |
+| OSativa | Megahit         | 114 | 20 | 
+
+| na12878 | ABySS 2.5       | 833 | 45 |
+| na12878 | DiscovarDeNovo  | 600 | 1672 |
+| na12878 | Megahit         | 667 | 104 |
+
+| na24631 | ABySS 2.5       | 645 | 45 |
+| na24631 | DiscovarDeNovo  | 580 | 1624 |
+| na24631 | Megahit         | 622 | 97 |
