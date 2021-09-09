@@ -1,17 +1,17 @@
 | Ecoli 2x100| SPAdes         | 160 | 12.11 | lightblue | 4 |
-| Ecoli 2x100| Unicycler (ec) | 2299 | 12.11 | dodgerblue4 | 3 |
+| Ecoli 2x100| Unicycler (ec) | 2299 | 12.11 | dodgerblue2 | 3 |
 | Ecoli 2x100| ABySS 2.5 nd   | 221 | 2.55 | darkgoldenrod1 | 1 |
 | Ecoli 2x301| ABySS 2.0 nd   | | | darkgoldenrod3 | 2 |
 | Ecoli 2x100| DiscovarDeNovo | 136 | 8.51 | indianred2 | 5 |
 
 | Ecoli 2x150| SPAdes         | 211 | 6.85 | lightblue | 4 |
-| Ecoli 2x150| Unicycler (ec) | 1335 | 7.83 | dodgerblue4 | 3 |
+| Ecoli 2x150| Unicycler (ec) | 1335 | 7.83 | dodgerblue2 | 3 |
 | Ecoli 2x150| ABySS 2.5 nd   | 85 | 3.18 | darkgoldenrod1 | 1 |
 | Ecoli 2x301| ABySS 2.0 nd   | | | darkgoldenrod3 | 2 |
 | Ecoli 2x150| DiscovarDeNovo | 96 | 11.72 | indianred2 | 5 |
 
 | Ecoli 2x301| SPAdes         | 734 | 13.14 | lightblue | 4 |
-| Ecoli 2x301| Unicycler (ec) | 1465 | 11.65 | dodgerblue4 | 3 | 
+| Ecoli 2x301| Unicycler (ec) | 1465 | 11.65 | dodgerblue2 | 3 | 
 | Ecoli 2x301| ABySS 2.5 nd   | 64 | 4.04 | darkgoldenrod1 | 1 |
 | Ecoli 2x301| ABySS 2.0 nd   | | | darkgoldenrod3 | 2 |
 | Ecoli 2x301| DiscovarDeNovo | 70 | 14.42 | indianred2 | 5 |
