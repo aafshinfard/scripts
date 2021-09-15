@@ -9,7 +9,8 @@ plottera <- function(experiment, data, xlimits=0, ylimits=0, breaks_count=0,
                      x_breaks_labels=c("0","5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55" ),
                      y_breaks=c(0,50,100,150,200,250, 300, 350,400 ),
                      y_breaks_labels=c(0,50,100,150,200,250, 300, 350,400 ),
-                     annotate=TRUE){
+                     annotate=TRUE,
+                     min_or_hr="(Mintues)"){
   if(xlimits==0 && length(xlimits)<2){
     xlimits=c(min(data$time)/2 , max(data$time)*1.3)
   }
@@ -35,9 +36,9 @@ plottera <- function(experiment, data, xlimits=0, ylimits=0, breaks_count=0,
       legend.title = element_text(size=15),
       legend.text = element_text(size=14)
     ) +
-    xlab("Wall clock time (Minutes)") + ylab("Peak memory (GB)")+
-    scale_x_continuous(limits =xlimits)+#,
-    #                   breaks=x_breaks, labels=x_breaks_labels)+
+    xlab(paste0("Wall clock time ", min_or_hr)) + ylab("Peak memory (GB)")+
+    scale_x_continuous(limits =xlimits,
+                       breaks=x_breaks, labels=x_breaks_labels)+
     scale_y_continuous(limits = ylimits)
     #                   #breaks=c(0,5e6,10e6,15e6,20e6,25e6,30e6,40e6,50e6,60e6,70e6,80e6 ),
     #                   breaks=y_breaks,
@@ -74,22 +75,36 @@ df2=df
 colnames(df2)=c("group","tool","time","mem","color", "order")
 
 df2$group=str_trim(df2$group)
-df2$tool=
-df2$time=as.numeric(str_trim(table$V5))
-df2$mem=as.numeric(str_trim(table$V5))
-df2$color=
-df2$order
+df2$tool=str_trim(df2$tool)
+df2$time=as.numeric(str_trim(df2$time))
+df2$mem=as.numeric(str_trim(df2$mem))
+df2$color=str_trim(df2$color)
+df2$order=as.numeric(str_trim(df2$order))
 
 library(gridExtra)
 
-#p1=plottera(experiment, df2[df2[,1]==" Ecoli 2x100",])
+p1=plottera("Ecoli 2x100", df2[df2[,1]=="Ecoli 2x100",])
 legend_e <- cowplot::get_legend(p1)
-p1=plottera(" Ecoli 2x100", df2[df2[,1]==" Ecoli 2x100",],annotate = FALSE)+theme(legend.position = "none")
-p2=plottera(" Ecoli 2x150", df2[df2[,1]==" Ecoli 2x150",])+theme(legend.position = "none")
-p3=plottera(" Ecoli 2x301", df2[df2[,1]==" Ecoli 2x301",])+theme(legend.position = "none")
+p1=plottera("Ecoli 2x100", df2[df2[,1]=="Ecoli 2x100",])+theme(legend.position = "none")
+p2=plottera("Ecoli 2x150", df2[df2[,1]=="Ecoli 2x150",])+theme(legend.position = "none")
+p3=plottera("Ecoli 2x301", df2[df2[,1]=="Ecoli 2x301",])+theme(legend.position = "none")
 
 
 grid.arrange(p1, p2, p3, legend_e, ncol=4)
+
+x_breaks=seq(0,960, by=60)
+x_breaks_labels=as.character(seq(0,16, by=1))
+
+
+p4 = plottera("na12878", df2[df2[,1]=="na24631",])
+legend_h <- cowplot::get_legend(p4)
+p4=plottera("na12878", df2[df2[,1]=="na12878",], xlimits = c(300,1000), x_breaks=x_breaks, x_breaks_labels = x_breaks_labels, min_or_hr = "(Hours)")+theme(legend.position = "none")
+p5=plottera("na24631", df2[df2[,1]=="na24631",], xlimits = c(300,1000), x_breaks=x_breaks, x_breaks_labels = x_breaks_labels, min_or_hr = "(Hours)")+theme(legend.position = "none")
+
+grid.arrange(p4, p5, legend_h, ncol=3)
+
+
+
 
 
 xbreaks = seq(0, 5000, by = 500)

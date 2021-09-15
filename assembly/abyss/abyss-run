@@ -2,40 +2,25 @@
 
 import os
 import sys
-import argparse
 import shutil
 import subprocess
+from subprocess import run
 from os.path import join
 
 ARGS_FILE = 'args'
 
 '''
-  ABySS input (in, lib, pe, mp, se,...), `B`, `k`, and `kc` are required params, either via `args` file or via cli.
+  ABySS input (in, lib, pe, mp, se,...), `k`, and `kc` are required params, either via `args` file or via cli (using the `param=arg` syntax).
+
+  Optional params: base_assembly, lineage_dataset, ref, quast_args
 '''
 
 args = {
-  'in': None,
-  'lib' : None,
-  'pe' : None,
-  'mp' : None,
-  'se' : None,
-  'B' : None,
-  'k' : None,
-  'kc' : None,
-  'n':'10',
-  'N' : '5-20',
-  'l': 40,
-  'S': '1000-10000',
-  'base_assembly' : None,
-  'abyss_bin' : '/projects/btl_scratch/vnikolic/installs/abyss-master-1/bin',
-  'quast_args' : None,
-  'RRESOLVER_OPTIONS' : None,
-  'ref' : None,
-  'lineage_dataset' : None,
+  'abyss_bin' : '/projects/btl_scratch/vnikolic/installs/abyss-2.3.1/bin',
   'name' : 'assembly',
   'H' : 4,
-  'verbose' : 2,
-  'threads' : 48,
+  'v' : '-vv',
+  'j' : 48,
   'targets': 'scaffolds stats',
 }
 
@@ -59,65 +44,40 @@ def link_assembly(base_assembly, derived_assembly, assembly_name):
   os.symlink     (base_dbg_fa,  derived_dbg_fa )
   os.symlink     (base_dbg_dot, derived_dbg_dot)
 
-parser = argparse.ArgumentParser()
-for key in args.keys():
-  if len(key) == 1:
-    param = '-' + key
-  else:
-    param = '--'
-    if key.isupper():
-      param += key
-    else:
-      param += key.lower().replace(' ', '-').replace('_', '-')
-  if key == 'verbose':
-    parser.add_argument(param, action='count')
-  else:
-    parser.add_argument(param)
-parser.add_argument('input', nargs='*')
-cli_args_raw = parser.parse_args()
 cli_args = {}
-
-for key in vars(cli_args_raw).keys():
-  value = vars(cli_args_raw)[key]
-  if key != 'input':
-    cli_args[key] = value
-  else:
-    for assignment in value:
-      tokens = assignment.split('=')
-      cli_args[tokens[0]] = tokens[1]
-
-for param in cli_args.keys():
-  arg = cli_args[param]
-  if arg != None and type(arg) != list: args[param] = arg
-
-if args['base_assembly'] != None: link_assembly(args['base_assembly'], '.', args['name'])
+for value in sys.argv[1:]:
+  tokens = value.split('=')
+  assert len(tokens) == 2
+  cli_args[tokens[0]] = tokens[1]
 
 file_args = {}
 if os.path.exists(ARGS_FILE):
   with open(ARGS_FILE, 'r') as f:
     for line in f:
-      if line.strip() == '': continue
-      tokens = line.strip().split('=')
+      line = line.strip()
+      if line == '': continue
+      tokens = line.split('=')
       if tokens[0][0] == '#': continue
-      if tokens[1] == '': tokens[1] = None
+      if len(tokens) == 1:
+        tokens.append(None)
       file_args[tokens[0]] = tokens[1]
 
 for param in file_args.keys():
   arg = file_args[param]
-  if arg != None: args[param] = arg
+  args[param] = arg
 
 for param in cli_args.keys():
   arg = cli_args[param]
-  if arg != None and type(arg) != list: args[param] = arg
+  args[param] = arg
 
-assert (args['in'] != None or
-        args['lib'] != None or
-        args['pe'] != None or
-        args['mp'] != None or
-        args['se'] != None)
-assert args['B'] != None
-assert args['k'] != None
-assert args['kc'] != None
+assert('in' in args or
+       'lib' in args or
+       'pe' in args or
+       'mp' in args or
+       'se' in args)
+assert 'k' in args
+assert 'kc' in args
+assert 'name' in args
 
 removed_quotes = {}
 for param in args.keys():
@@ -131,58 +91,71 @@ args = removed_quotes
 with open(ARGS_FILE, 'w') as f:
   for param in args.keys():
     arg = args[param]
-    f.write(param + '=' + ('' if arg == None else str(arg)) + '\n')
+    if arg == None:
+      f.write(f"{param}\n")
+    else:
+      f.write(f"{param}={arg}\n")
 
+if 'base_assembly' in args and args['base_assembly'] != None: link_assembly(args['base_assembly'], '.', args['name'])
+
+old_env = {}
 for param in args.keys():
   arg = args[param]
-  if arg != None: os.environ[str(param)] = str(arg)
+  if arg != None:
+    if str(param) in os.environ:
+      old_env[str(param)] = os.environ[str(param)]
+    else:
+      old_env[str(param)] = None
+    os.environ[str(param)] = str(arg)
 
+old_env['PATH'] = os.environ['PATH']
 os.environ['PATH'] = args['abyss_bin'] + ':' + os.environ['PATH']
 
-subprocess.run([ '/usr/bin/time', '-pv', 'abyss-pe',
-  'name={}'.format(args['name']),
-  'B={}'.format(args['B']),
-  'H={}'.format(args['H']),
-  'k={}'.format(args['k']),
-  'kc={}'.format(args['kc']),
-  'j={}'.format(args['threads']),
-  'N={}'.format(args['N']),
-  'n={}'.format(args['n']),
-  'l={}'.format(args['l']),
-  'S={}'.format(args['S']),
-  '' if args['verbose'] == 0 else ('v=-' + 'v' * int(args['verbose'])),
-  'time=true',
-  ] + args['targets'].split()
-)
+if 'time' in os.environ: old_env['time'] = os.environ['time']
+os.environ['time'] = 'true'
+
+run([ 'export' ], shell=True)
+
+run([ '/usr/bin/time', '-pv', 'abyss-pe' ] + args['targets'].split())
+
+for param in old_env.keys():
+  arg = old_env[param]
+  if arg == None:
+    del os.environ[param]
+  else:
+    os.environ[param] = arg
 
 for file in os.listdir('.'):
   if (file != ARGS_FILE and
      not file.startswith('abyss-run') and
-     not file.startswith('quast-analysis') and
-     not file.startswith('busco-analysis') and
+     not file.startswith('quast') and
+     not file.startswith('busco') and
      not file.endswith('.time') and
      not file.endswith('.tsv') and
-     not file.startswith('{}-stats'.format(args['name'])) and
+     not file.startswith(f'{args["name"]}-stats') and
      not file.endswith('-1.fa') and
      not file.endswith('-1.dot') and
      not file.endswith('-8.fa') and
      not file.endswith('-scaffolds.fa')):
     if os.path.isdir(file):
       shutil.rmtree(file, ignore_errors=True)
-    #else:
-      #os.remove(file)
+    else:
+      os.remove(file)
 
-if os.path.exists('{}-scaffolds.fa'.format(args['name'])):
- subprocess.run([ 'quast-run',
-   '--no-icarus',
-   '{}-scaffolds.fa'.format(args['name']),
- ] + ([] if args['ref'] == None else [ '-r', args['ref'] ])
-   + ([] if args['quast_args'] == None else args['quast_args'].split()))
+if os.path.exists(f'{args["name"]}-scaffolds.fa'):
+  run([ 'quast-analysis',
+    '--space-efficient',
+    '--no-icarus',
+    f'{args["name"]}-scaffolds.fa',
+  ] + ([] if ('ref' not in args or args['ref'] == None or args['ref'] == '') else [ '-r', args['ref'] ])
+    + ([] if ('j' not in args or args['j'] == None or args['j'] == '') else [ '--threads', str(args['j']) ])
+    + ([] if ('est_ref_size' not in args or args['est_ref_size'] == None or args['est_ref_size'] == '') else [ '--est-ref-size', str(args['est_ref_size']) ])
+    + ([] if ('quast_args' not in args or args['quast_args'] == None) else args['quast_args'].split()))
 
- if args['lineage_dataset'] != None:
-   subprocess.run([ 'busco-run',
-     '--mode', 'genome',
-     '--lineage_dataset', args['lineage_dataset'],
-     '--space-efficient',
-     '--in', '{}-scaffolds.fa'.format(args['name']),
-   ])
+  if 'lineage_dataset' in args and args['lineage_dataset'] != None:
+    run([ 'busco-analysis',
+      '--mode', 'genome',
+      '--lineage_dataset', args['lineage_dataset'],
+      '--space-efficient',
+      '--in', f'{args["name"]}-scaffolds.fa',
+    ] + ([] if ('busco_args' not in args or args['busco_args'] == None) else args['busco_args'].split()))

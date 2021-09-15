@@ -13,7 +13,7 @@ import uuid, base64
 ARGS_FILE = 'args'
 
 abyss_run_params = [
-  'in', 'lib', 'pe', 'mp', 'se', 'B', 'k', 'kc', 'base_assembly','l','S','N','n',
+  'in', 'lib', 'pe', 'mp', 'se', 'B', 'k', 'kc', 'base_assembly','l','S','N','n','m',
   'abyss_bin', 'quast_args', 'RRESOLVER_OPTIONS', 'ref',
   'lineage_dataset', 'name', 'H', 'verbose', 'threads', 'targets',
 ]
