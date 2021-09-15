@@ -143,19 +143,11 @@ for file in os.listdir('.'):
       os.remove(file)
 
 if os.path.exists(f'{args["name"]}-scaffolds.fa'):
-  run([ 'quast-analysis',
-    '--space-efficient',
+  run([ 'quast-run',
+    #'--space-efficient',
     '--no-icarus',
     f'{args["name"]}-scaffolds.fa',
   ] + ([] if ('ref' not in args or args['ref'] == None or args['ref'] == '') else [ '-r', args['ref'] ])
     + ([] if ('j' not in args or args['j'] == None or args['j'] == '') else [ '--threads', str(args['j']) ])
     + ([] if ('est_ref_size' not in args or args['est_ref_size'] == None or args['est_ref_size'] == '') else [ '--est-ref-size', str(args['est_ref_size']) ])
     + ([] if ('quast_args' not in args or args['quast_args'] == None) else args['quast_args'].split()))
-
-  if 'lineage_dataset' in args and args['lineage_dataset'] != None:
-    run([ 'busco-analysis',
-      '--mode', 'genome',
-      '--lineage_dataset', args['lineage_dataset'],
-      '--space-efficient',
-      '--in', f'{args["name"]}-scaffolds.fa',
-    ] + ([] if ('busco_args' not in args or args['busco_args'] == None) else args['busco_args'].split()))
