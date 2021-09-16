@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+
+parser = argparse.ArgumentParser()
+parser.add_argument('quast_dir')
+cli_args = parser.parse_args()
+
+nga50 = -1
+ng50 = -1
+n50 = -1
+misassemblies = -1
+genome_fraction = -1
+if os.path.exists(os.path.join(cli_args.quast_dir, 'report.txt')):
+  with open(os.path.join(cli_args.quast_dir, 'report.txt'), 'r') as report:
+    for line in report:
+      if line.startswith('# misassemblies'):
+        tokens = line.split()
+        for token in tokens:
+          try:
+            misassemblies = int(token)
+          except ValueError:
+            pass
+      elif line.startswith('NGA50'):
+        tokens = line.split()
+        for token in tokens:
+          try:
+            nga50 = int(token)
+          except ValueError:
+            pass
+      elif line.startswith('NG50'):
+        tokens = line.split()
+        for token in tokens:
+          try:
+            ng50 = int(token)
+          except ValueError:
+            pass
+      elif line.startswith('N50'):
+        tokens = line.split()
+        for token in tokens:
+          try:
+            n50 = int(token)
+          except ValueError:
+            pass
+      elif line.startswith('Genome fraction (%)'):
+        genome_fraction = line.split()[3]
+print("NGA50: {}\nNG50: {}\nN50: {}\nMisassemblies: {}\nGenome fraction (%): {}".format(nga50, ng50, n50, misassemblies, genome_fraction))
