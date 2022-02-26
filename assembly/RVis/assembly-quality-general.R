@@ -112,7 +112,7 @@ plotter1 <- function(experiment, data, xlimits, ylimits, breaks_count=0,
       panel.grid.minor.y = element_line( size=0.5 ),
       panel.grid.minor.x = element_blank(),
     ) + 
-    geom_text(aes(label = paste0(round(data$fraction, digits=1), "%")), nudge_y = (ylimits[2]-ylimits[1])/50 )
+    geom_text(aes(label = paste0(round(data$fraction, digits=1), "%")), nudge_y = (ylimits[2]-ylimits[1])/70, fontface = "bold" )
   if (rotate == TRUE)
     frange50 = frange50 + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
   return (frange50)
@@ -124,7 +124,7 @@ dodger <- function(results){
   results2 <- results %>%
     group_by(misassemblies) %>%
     mutate(
-      width = (dodger_width * n())
+      width = (dodger_width * n())/1.5
     )
   return (results2)
 }
@@ -134,7 +134,7 @@ dodger2 <- function(results){
     group_by(misassemblies) %>%
     mutate(
       #width = 1.2 * n()
-      width = dodger2_width * n()
+      width = (dodger2_width * n())/1.4
     )
   return (results2)
 }

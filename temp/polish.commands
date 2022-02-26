@@ -1,7 +1,9 @@
+#!/bin/bash
+
 sed 's:|:   |       :g' results.tsv > results_polished.tsv
 sed -i 's:,::g' results_polished.tsv
 # Check if number of columns agree
-awk 'BEGIN { FS ="|"}; {print NF}' results_polished.tsv
+#awk 'BEGIN { FS ="|"}; {print NF}' results_polished.tsv
 awk 'BEGIN { FS = "|"}; {print NF}' results_polished.tsv | wc -l
-awk 'BEGIN { FS = "|"}; {if(NF>3) print}' results_polished.tsv | wc -l
+awk 'BEGIN { FS = "|"}; {if(NF==13) print}' results_polished.tsv | wc -l
 awk 'BEGIN { FS = "|"}; {if(NF>3) print}' results_polished.tsv > results_final.tsv
