@@ -2,16 +2,16 @@ import random
 from Bio import SeqIO
 
 # inputs
-input_file="./celegans_genomic.fa"
-output_file="./celegans_chr1-chr2_rearranged.fa"
-chunk_size=5 * (10 ** 5)
+input_file="./celegans_genome.fasta"
+output_file="./celegans_genome_rearranged.fa"
+chunk_size=3 * (10 ** 5)
 #chunk_size=10
 
 ## local variables
 names=list()
 sequences=list()
 it=0
-misassembled_seq=">toy.fa_rearranged_500kbchunks \n"
+misassembled_seq=">celegans_genome.fasta_rearranged_300kbchunks \n"
 
 def add_N_to_assembly(chunk_size):
     return misassembled_seq + "N"*chunk_size
@@ -38,6 +38,7 @@ for fa_seq in fa_seqs:
 #new_sequences.append(sequences[0])
 #new_sequences.append(sequences[1])
 #sequences = new_sequences
+#print([names[0], names[1]])
 
 chromosome_set = set(range(0,len(sequences))) # set of chromosome with sequences remained to use
 last_choice=-1
