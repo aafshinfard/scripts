@@ -2,8 +2,8 @@ import random
 from Bio import SeqIO
 
 # inputs
-input_file="./celegans_genome.fasta"
-output_file="./celegans_genome_rearranged.fa"
+input_file="./celegans_chr1-chr2.fasta"
+output_file="./celegans_chr1-chr2.fasta_rearranged.fasta"
 chunk_size=3 * (10 ** 5)
 #chunk_size=10
 
